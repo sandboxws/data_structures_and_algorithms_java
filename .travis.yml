@@ -23,5 +23,6 @@ before_script:
 script:
   - gradle check
   - gradle test
+  - gradle codeCoverageReport
 after_script:
-  - ./cc-test-reporter after-build -t simplecov -p /home/travis/build/sandboxws/ds_algorithms
+  - bash <(curl -s https://codecov.io/bash)
