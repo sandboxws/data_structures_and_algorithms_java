@@ -1,0 +1,60 @@
+# Java Gradle CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-java/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/openjdk:8-jdk
+
+    working_directory: ~/ds_algorithms
+
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "build.gradle" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run:
+          name: Install dependencies
+          command: |
+            gradle build -x test
+
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+
+      # run checks!
+      - run:
+          name: Code Analysis
+          command: |
+            gradle check
+
+      # run tests!
+      - run:
+          name: Running Test
+          command: |
+            gradle test
+
+      - store_test_results:
+          path: ~/ds_algorithms/build/test-results
+
+      - store_artifacts:
+          path: ~/ds_algorithms/build/reports/checkstyle
+
+      - store_artifacts:
+          path: ~/ds_algorithms/build/reports/findbugs
+
+
+
