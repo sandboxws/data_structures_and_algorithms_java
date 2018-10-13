@@ -19,10 +19,14 @@ notifications: false
 before_install:
   - gradle assemble
 before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+  - chmod +x gradlew
   - gradle build -x test
 script:
   - gradle check
   - gradle test
-  - gradle codeCoverageReport
 after_script:
-  - bash <(curl -s https://codecov.io/bash)
+  - ./cc-test-reporter format-coverage -d -t jacoco /home/travis/build/sandboxws/ds_algorithms/build/reports/jacoco/test/jacocoTestReport.xml
+  - ./cc-test-reporter upload-coverage -d
